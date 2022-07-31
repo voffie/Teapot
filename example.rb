@@ -4,6 +4,7 @@ server = Teapot.new(4567)
 
 begin
   server.get('/') do |response|
+    response.create_cookie('example', 'cookie')
     response.body = File.read('views/index.html')
   end
 
