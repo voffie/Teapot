@@ -19,6 +19,10 @@ class Response
     @cookies[name] = value
   end
 
+  def change_status(status)
+    @status = status
+  end
+
   def change_content_type(type)
     @header['Content-Type'] = type
   end
@@ -36,13 +40,17 @@ class Response
       "Set-Cookie: #{key}=#{value}"
     end.join("\r\n")
 
-    if cookies == ""
+    if cookies == ''
       "#{@protocol} #{status}\r\n#{headers}\r\n\r\n#{@body}"
     else
       "#{@protocol} #{status}\r\n#{headers}\r\n#{cookies}\r\n\r\n#{@body}"
     end
   end
 
+  def redirect(location)
+    @header['Location'] = location
+    change_status(301)
+  end
 
   def print
     puts create_response.green
