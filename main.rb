@@ -14,6 +14,7 @@ class Teapot
     @port = port
     @parser = Parser.new
     @router = Router.new
+    @img_endings = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
   end
 
   def launch
@@ -36,6 +37,11 @@ class Teapot
         if parsed_data[:Accept].include?('text/css')
           response = Response.new(css(parsed_data[:resource]), 200)
           response.change_content_type('text/css')
+        elsif @img_endings.include?(parsed_data[:resource].split('.')[1].to_s)
+          type, content, size = load_img(parsed_data[:resource])
+          response = Response.new(content, 200)
+          response.change_content_type(type)
+          response.change_content_length(size)
         elsif @router.get_routes[parsed_data[:resource].to_s].nil?
           response = Response.new('Error', 404)
         else
@@ -69,9 +75,67 @@ class Teapot
       end
     else
       begin
-        content = File.open("./public#{resource}").read
+        File.open("./public#{resource}").read
       rescue Errno::ENOENT
         p 'CSS-file is not found!'
+        ['', 500]
+      end
+    end
+  end
+
+  def load_img(resource)
+    if Dir.exist?('./public/img')
+      begin
+        image = File.open("./public/img#{resource}", 'rb').read
+        ct = ''
+
+        case resource.split('.')[-1]
+        when 'apng'
+          ct = 'image/apng'
+        when 'avif'
+          ct = 'image/avif'
+        when 'gif'
+          ct = 'image/gif'
+        when 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp'
+          ct = 'image/jpeg'
+        when 'png'
+          ct = 'image/png'
+        when 'svg'
+          ct = 'image/svg+xml'
+        when 'webp'
+          ct = 'image/webp'
+        end
+
+        [ct, image, File.size("./public#{resource}")]
+      rescue Errno::ENOENT
+        p 'Bilden finns ej!'
+        ['', 500]
+      end
+    else
+      begin
+        image = File.open("./public#{resource}", 'rb').read
+        ct = ''
+
+        case resource.split('.')[-1]
+        when 'apng'
+          ct = 'image/apng'
+        when 'avif'
+          ct = 'image/avif'
+        when 'gif'
+          ct = 'image/gif'
+        when 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp'
+          ct = 'image/jpeg'
+        when 'png'
+          ct = 'image/png'
+        when 'svg'
+          ct = 'image/svg+xml'
+        when 'webp'
+          ct = 'image/webp'
+        end
+
+        [ct, image, File.size("./public#{resource}")]
+      rescue Errno::ENOENT
+        p 'Bilden finns ej!'
         ['', 500]
       end
     end

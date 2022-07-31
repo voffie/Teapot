@@ -26,6 +26,10 @@ class Response
     @header['Content-Type'] = type
   end
 
+  def change_content_length(length)
+    @header['Content-Length'] = length.to_s
+  end
+
   def print
     puts create_response.green
   end
