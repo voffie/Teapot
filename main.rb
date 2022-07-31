@@ -42,6 +42,9 @@ class Teapot
           response = Response.new(content, 200)
           response.change_content_type(type)
           response.change_content_length(size)
+        elsif parsed_data[:resource].end_with?('js') || parsed_data[:resource].end_with?('ts')
+          response = Response.new(File.read(parsed_data[:resource][1..-1].to_s), 200)
+          response.change_content_type('*/*')
         elsif @router.get_routes[parsed_data[:resource].to_s].nil?
           response = Response.new('Error', 404)
         else
