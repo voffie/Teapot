@@ -2,6 +2,7 @@ require_relative 'color'
 
 VALID_METHODS = %w[GET HEAD POST PUT DELETE CONNECT OPTIONS TRACE PATCH].freeze
 
+# Parses HTTP Requests
 class Parser
   attr_reader :parsed_request
 

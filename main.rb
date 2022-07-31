@@ -3,6 +3,7 @@ require_relative 'color'
 require_relative 'parser'
 require_relative 'router'
 
+# Handles HTTP responses and returns data accordingly
 class Teapot
   attr_reader :server
 
