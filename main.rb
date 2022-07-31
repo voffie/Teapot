@@ -2,6 +2,9 @@ require 'socket'
 require_relative 'color'
 require_relative 'parser'
 require_relative 'router'
+require_relative 'response'
+
+MAX_RESPONSE_LENGTH = 5000
 
 # Handles HTTP responses and returns data accordingly
 class Teapot
@@ -29,8 +32,18 @@ class Teapot
 
       case parsed_data[:method]
       when 'GET'
-
+        response = Response.new('No body')
+        @router.get_routes[parsed_data[:resource].to_s].call(response)
       end
+
+      puts 'Outgoing:'
+      if response.create_response.length < MAX_RESPONSE_LENGTH
+        response.print
+      else
+        puts "#{parsed_data[:resource]} as binary".yellow
+      end
+      session.print response.create_response.to_s
+      session.close
     end
   end
 
