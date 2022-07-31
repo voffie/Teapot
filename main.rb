@@ -32,8 +32,16 @@ class Teapot
 
       case parsed_data[:method]
       when 'GET'
-        response = Response.new('No body')
-        @router.get_routes[parsed_data[:resource].to_s].call(response)
+
+        if parsed_data[:Accept].include?('text/css')
+          response = Response.new(css(parsed_data[:resource]), 200)
+          response.change_content_type('text/css')
+        elsif @router.get_routes[parsed_data[:resource].to_s].nil?
+          response = Response.new('Error', 404)
+        else
+          response = Response.new('No body')
+          @router.get_routes[parsed_data[:resource].to_s].call(response)
+        end
       end
 
       puts 'Outgoing:'
@@ -49,5 +57,23 @@ class Teapot
 
   def get(path, &block)
     @router.get_routes[path] = block
+  end
+
+  def css(resource)
+    if Dir.exist?('./public/css')
+      begin
+        File.open("./public/css#{resource}").read
+      rescue Errno::ENOENT
+        p 'CSS-file is not found!'
+        ['', 500]
+      end
+    else
+      begin
+        content = File.open("./public#{resource}").read
+      rescue Errno::ENOENT
+        p 'CSS-file is not found!'
+        ['', 500]
+      end
+    end
   end
 end

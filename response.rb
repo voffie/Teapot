@@ -18,7 +18,12 @@ class Response
     headers = @header.to_a.map do |key, value|
       "#{key}: #{value}"
     end.join("\r\n")
+
     "#{@protocol} #{status}\r\n#{headers}\r\n\r\n#{@body}"
+  end
+
+  def change_content_type(type)
+    @header['Content-Type'] = type
   end
 
   def print
