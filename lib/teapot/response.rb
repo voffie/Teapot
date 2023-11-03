@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require_relative 'color'
 
-# Generates HTTP Response
 class Response
+  include ResourceManager
   attr_accessor :body, :status
 
   def initialize(body, status = 200)
@@ -54,5 +56,9 @@ class Response
 
   def print
     puts create_response.green
+  end
+
+  def slim(resource, layout = true, locals = {})
+    slim(resource, layout, locals)
   end
 end

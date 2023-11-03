@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Adds a function making it possible to print colored text to the terminal
 class String
   def colorize(color_code)
     "\e[#{color_code}m#{self}\e[0m"
