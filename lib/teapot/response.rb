@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'color'
+require 'teapot/color'
+require 'teapot/resourceManager'
 
 class Response
   include ResourceManager
@@ -12,9 +13,7 @@ class Response
     @status = status
     @cookies = {}
 
-    @header = {
-      'Content-Type' => 'text/html; charset=utf-8'
-    }
+    @header = {}
   end
 
   def create_cookie(name, value)
@@ -59,6 +58,6 @@ class Response
   end
 
   def slim(resource, layout = true, locals = {})
-    slim(resource, layout, locals)
+    load_slim(resource, layout, locals)
   end
 end

@@ -5,8 +5,11 @@ VALID_METHODS = %w[GET POST PUT DELETE PATCH].freeze
 module Parser
   def parse(request)
     request = request.split("\n")
-    parsed_request = {}
+    if request[0].nil?
+      return nil
+    end
     method, resource, http = request[0].split(' ')
+    parsed_request = {}
     if VALID_METHODS.include? method
       parsed_request[:method] = method
       parsed_request[:resource] = resource

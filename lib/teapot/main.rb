@@ -10,7 +10,6 @@ class Teapot
 
   def initialize()
     @router = Router.new
-    @img_endings = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
   end
 
   def listen(port, option)
@@ -29,22 +28,46 @@ class Teapot
   end
 
   def get(path, &block)
-    @router.get_routes[path] = block
+    parsedParams = getParamsFromPath(path)
+    regex = path === "/" ? /^\/$/ : generateRegExp(path)
+    @router.get_routes.push({path: path, regex: regex, code: block, params: parsedParams})
   end
 
   def post(path, &block)
-    @router.post_routes[path] = block
+    regex = generateRegExp(path)
+    @router.post_routes.push({path: path, regex: regex, code: block})
   end
 
   def put(path, &block)
-    @router.put_routes[path] = block
+    regex = generateRegExp(path)
+    @router.put_routes.push({path: path, regex: regex, code: block})
   end
 
   def delete(path, &block)
-    @router.delete_routes[path] = block
+    regex = generateRegExp(path)
+    @router.delete_routes.push({path: path, regex: regex, code: block})
   end
 
   def patch(path, &block)
-    @router.patch_routes[path] = block
+    regex = generateRegExp(path)
+    @router.patch_routes.push({path: path, regex: regex, code: block})
   end
+end
+
+# https://stackoverflow.com/questions/67407289/check-if-path-matches-dynamic-route-string
+def generateRegExp(path)
+  escapeDots = -> (s) {s.split('').each {|char| char === "." ? '\\.' : char}.join('')}
+  regex = path.split("/").map {|s| s.start_with?(':') ? "[^\\/]+" : escapeDots.call(s)}
+  return Regexp.new("^#{regex.join('\/')}$")
+end
+
+def getParamsFromPath(path)
+  params = path.split('/').reject(&:empty?)
+  parsedParams = {}
+  if params.length != 0
+    params.each_with_index do |param, index|
+      parsedParams[param] = ""
+    end
+  end
+  return parsedParams
 end
