@@ -13,12 +13,8 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
-    psych (5.1.1.1)
-      stringio
     racc (1.7.2)
     rainbow (3.1.1)
-    rdoc (6.5.0)
-      psych (>= 4.0.0)
     regexp_parser (2.8.2)
     rexml (3.2.6)
     rubocop (1.53.1)
@@ -38,21 +34,17 @@ GEM
     slim (5.1.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    stringio (3.0.8)
     temple (0.10.3)
     tilt (2.3.0)
     unicode-display_width (2.5.0)
-    yard (0.9.34)
 
 PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
   Teapot!
-  rdoc
   rubocop
   slim
-  yard
 
 BUNDLED WITH
    2.4.21
