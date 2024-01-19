@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'teapot/color'
-require 'teapot/resourceManager'
+require 'teapot/resource_manager'
 
 class Response
   include ResourceManager

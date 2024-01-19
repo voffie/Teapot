@@ -8,66 +8,66 @@ class Teapot
   include Parser
   attr_reader :server
 
-  def initialize()
+  def initialize
     @router = Router.new
   end
 
   def listen(port, option)
     server = TCPServer.new(port)
-    option.call()
+    option.call
     while (session = server.accept)
       data = ''
       while (line = session.gets) && line !~ /^\s*$/
         data += line
       end
       parsed_data = parse(data)
-      response = @router.handleMethod(parsed_data)
+      response = @router.handle_method(parsed_data)
       session.print response
       session.close
     end
   end
 
   def get(path, &block)
-    parsedParams = getParamsFromPath(path)
-    regex = path === "/" ? /^\/$/ : generateRegExp(path)
-    @router.get_routes.push({path: path, regex: regex, code: block, params: parsedParams})
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.get_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def post(path, &block)
-    regex = generateRegExp(path)
-    @router.post_routes.push({path: path, regex: regex, code: block})
+    regex = generate_reg_exp(path)
+    @router.post_routes.push({ path: path, regex: regex, code: block })
   end
 
   def put(path, &block)
-    regex = generateRegExp(path)
-    @router.put_routes.push({path: path, regex: regex, code: block})
+    regex = generate_reg_exp(path)
+    @router.put_routes.push({ path: path, regex: regex, code: block })
   end
 
   def delete(path, &block)
-    regex = generateRegExp(path)
-    @router.delete_routes.push({path: path, regex: regex, code: block})
+    regex = generate_reg_exp(path)
+    @router.delete_routes.push({ path: path, regex: regex, code: block })
   end
 
   def patch(path, &block)
-    regex = generateRegExp(path)
-    @router.patch_routes.push({path: path, regex: regex, code: block})
+    regex = generate_reg_exp(path)
+    @router.patch_routes.push({ path: path, regex: regex, code: block })
   end
 end
 
 # https://stackoverflow.com/questions/67407289/check-if-path-matches-dynamic-route-string
-def generateRegExp(path)
-  escapeDots = -> (s) {s.split('').each {|char| char === "." ? '\\.' : char}.join('')}
-  regex = path.split("/").map {|s| s.start_with?(':') ? "[^\\/]+" : escapeDots.call(s)}
-  return Regexp.new("^#{regex.join('\/')}$")
+def generate_reg_exp(path)
+  escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
+  regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
+  Regexp.new("^#{regex.join('\/')}$")
 end
 
-def getParamsFromPath(path)
+def get_params_from_path(path)
   params = path.split('/').reject(&:empty?)
-  parsedParams = {}
-  if params.length != 0
-    params.each_with_index do |param, index|
-      parsedParams[param] = ""
+  parsed_params = {}
+  unless params.empty?
+    params.each do |param|
+      parsed_params[param] = ''
     end
   end
-  return parsedParams
+  parsed_params
 end

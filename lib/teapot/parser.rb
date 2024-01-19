@@ -8,7 +8,8 @@ module Parser
     if request[0].nil?
       return nil
     end
-    method, resource, http = request[0].split(' ')
+
+    method, resource, http = request[0].split
     parsed_request = {}
     if VALID_METHODS.include? method
       parsed_request[:method] = method
@@ -21,6 +22,6 @@ module Parser
     else
       parsed_request[:error] = "Invalid method found in request! #{method} is not a valid method!"
     end
-    return parsed_request
+    parsed_request
   end
 end
