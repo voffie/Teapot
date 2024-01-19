@@ -1,16 +1,14 @@
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
   SuggestExtensions: false
   NewCops: enable
   Exclude:
-    - "public/*"
-    - "views/*"
+    - "examples/*"
 
 Layout/ExtraSpacing:
   AllowForAlignment: true
   AllowBeforeTrailingComments: true
 
-# Temporary disable cops because warnings are fixed
 Style/SingleLineMethods:
   Enabled: false
 
