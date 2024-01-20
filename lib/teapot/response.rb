@@ -60,4 +60,21 @@ class Response
   def slim(resource, layout = true, locals = {})
     load_slim(resource, layout, locals)
   end
+
+  def not_found()
+    @body = '<!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+        />
+        <title>Teapot - 404</title>
+      </head>
+      <body>
+        <h1>Teapot 404 screen</h1>
+      </body>
+    </html>'
+  end
 end

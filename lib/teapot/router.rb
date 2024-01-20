@@ -2,6 +2,7 @@
 
 require 'teapot/response'
 require 'teapot/resource_manager'
+require 'teapot/color'
 
 IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
 
@@ -54,6 +55,15 @@ class Router
         value = load_script(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('*/*')
+      else
+        puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow}!"
+        begin
+          response = Response.new(File.read('errors/404.html'), 200)
+          response.change_content_type('text/html; charset=utf-8')
+        rescue Errno::ENOENT
+          response = Response.new("", 404)
+          response.not_found
+        end
       end
     when 'POST'
       current_route = @post_routes.find { |route| route[:regex].match(data[:resource]) }
@@ -78,7 +88,7 @@ class Router
     end
 
     if response.nil?
-      response = Response.new('', 404)
+      response = Response.new("", 404)
     end
     response.create_response.to_s
   end
