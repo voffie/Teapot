@@ -18,7 +18,10 @@ class Router
     @patch_routes = []
   end
 
-  def handle_method(data)
+  def handle_method(data, middlewares)
+    if middlewares.length > 0 && data[:resource].split(".").length == 1
+      middlewares.each {|middleware| middleware.call}
+    end
     case data[:method]
     when 'GET'
       current_route = @get_routes.find { |route| route[:regex].match(data[:resource]) }
