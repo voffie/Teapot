@@ -10,6 +10,8 @@ class Teapot
 
   def initialize
     @router = Router.new
+    @server_middlewares = []
+    @route_middlewares = []
   end
 
   def listen(port, option)
@@ -21,7 +23,7 @@ class Teapot
         data += line
       end
       parsed_data = parse(data)
-      response = @router.handle_method(parsed_data)
+      response = @router.handle_method(parsed_data, @server_middlewares, @route_middlewares)
       session.print response
       session.close
     end
@@ -51,6 +53,15 @@ class Teapot
   def patch(path, &block)
     regex = generate_reg_exp(path)
     @router.patch_routes.push({ path: path, regex: regex, code: block })
+  end
+
+  def use_middleware(path, &block)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @route_middlewares.push({ path: path, regex: regex, code: block })
+  end
+
+  def before(block)
+    @server_middlewares.push(block)
   end
 end
 

@@ -18,11 +18,16 @@ class Router
     @patch_routes = []
   end
 
-  def handle_method(data)
+  def handle_method(data, server_middlewares, route_middlewares)
+    if server_middlewares.length > 0 && data[:resource].split(".").length == 1
+      server_middlewares.each { |middleware| middleware.call }
+    end
     case data[:method]
     when 'GET'
       current_route = @get_routes.find { |route| route[:regex].match(data[:resource]) }
       if current_route
+        current_route_middleware = route_middlewares.select { |middleware| middleware[:regex] == current_route[:regex]}
+        current_route_middleware.length > 0 ? current_route_middleware[0][:code].call : nil
         params_value = data[:resource].split('/').reject(&:empty?)
         current_route[:params].keys.each_with_index do |key, index|
           current_route[:params][key] = params_value[index]
@@ -33,18 +38,18 @@ class Router
         response = Response.new('')
         response.change_content_type('text/html; charset=utf-8')
         current_route[:code].call(request, response)
-        # Handles css
+      # Handles css
       elsif data[:Accept].include?('text/css')
         value = css(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('text/css')
-        # Handles imgs
+      # Handles imgs
       elsif IMG_ENDINGS.include?(data[:resource].split('.')[1].to_s)
         value = load_img(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:file]) : Response.new('Not found', 404)
         response.change_content_type(value[:ct])
         response.change_content_length(value[:size])
-        # Handles scripts (js/ts currently)
+      # Handles scripts (js/ts currently)
       elsif data[:resource].end_with?('js') || data[:resource].end_with?('ts')
         value = load_script(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
@@ -73,7 +78,7 @@ class Router
     end
 
     if response.nil?
-      response = Response.new('Not implemented yet', 200)
+      response = Response.new('', 404)
     end
     response.create_response.to_s
   end
