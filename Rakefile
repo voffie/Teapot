@@ -6,5 +6,5 @@ task default: :test
 
 Minitest::TestTask.create(:test) do |t|
   t.warning = true
-  t.test_globs = %w[].map { |n| "test/#{n}_test.rb" }
+  t.test_globs = %w[error route].map { |n| "test/#{n}_test.rb" }
 end
