@@ -1,10 +1,9 @@
 name: Testing
 
 on:
-  push:
+  pull_request:
     branches:
       - "**"
-  pull_request:
 
 permissions:
   contents: read
