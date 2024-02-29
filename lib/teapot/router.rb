@@ -62,7 +62,7 @@ class Router
           response.change_content_type('text/html; charset=utf-8')
         rescue Errno::ENOENT
           response = Response.new("", 404)
-          response.not_found
+          response.not_found(data[:resource])
         end
       end
     when 'POST'

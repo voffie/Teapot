@@ -61,20 +61,48 @@ class Response
     load_slim(resource, layout, locals)
   end
 
-  def not_found()
-    @body = '<!DOCTYPE html>
-    <html lang="en">
+  def not_found(route)
+    @body = "<!DOCTYPE html>
+    <html lang='en'>
       <head>
-        <meta charset="UTF-8" />
+        <meta charset='UTF-8' />
         <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
+          name='viewport'
+          content='width=device-width, initial-scale=1.0'
         />
         <title>Teapot - 404</title>
+        <style>
+          *,
+          *::before,
+          *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+
+          div {
+            position: fixed;
+            inset: 0px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to bottom, #151515, #171717);
+            color: white;
+            gap: .5rem;
+          }
+
+          h1, p {
+            z-index: 1;
+          }
+        </style>
       </head>
       <body>
-        <h1>Teapot 404 screen</h1>
+        <div>
+          <h1>Teapot does not recognize this kettle</h1>
+          <p>Unkown route #{route}
+        </div>
       </body>
-    </html>'
+    </html>"
   end
 end
