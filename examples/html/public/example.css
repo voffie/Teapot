@@ -1,0 +1,23 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+div {
+  position: fixed;
+  inset: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(to bottom, #151515, #171717);
+  color: white;
+  gap: 0.5rem;
+}
+h1,
+p {
+  z-index: 1;
+}
