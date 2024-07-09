@@ -100,7 +100,61 @@ class Response
       <body>
         <div>
           <h1>Teapot does not recognize this kettle</h1>
-          <p>Unkown route #{route}
+          <p>Unkown route #{route}</p>
+        </div>
+      </body>
+    </html>"
+  end
+
+  def server_error(error)
+    @body = "<!DOCTYPE html>
+    <html lang='en'>
+      <head>
+        <meta charset='UTF-8' />
+        <meta
+          name='viewport'
+          content='width=device-width, initial-scale=1.0'
+        />
+        <title>Teapot - 404</title>
+                <style>
+          *,
+          *::before,
+          *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+
+          div {
+            position: fixed;
+            inset: 0px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to bottom, #151515, #171717);
+            color: white;
+            gap: .5rem;
+          }
+
+          h1, p {
+            z-index: 1;
+          }
+
+          p {
+            margin-bottom: 2rem;
+          }
+
+          code {
+            background: #eee;
+          }
+        </style>
+      </head>
+      <body>
+        <div>
+          <h1>Teapot had issues using this kettle</h1>
+          <p>#{error.class}: #{error.message}</p>
+          <pre>#{error.backtrace}</pre>
         </div>
       </body>
     </html>"
