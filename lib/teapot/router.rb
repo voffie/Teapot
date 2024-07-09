@@ -2,6 +2,7 @@
 
 require 'teapot/response'
 require 'teapot/resource_manager'
+require 'teapot/color'
 
 IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
 
@@ -20,14 +21,36 @@ class Router
 
   def handle_method(data, server_middlewares, route_middlewares)
     if server_middlewares.length > 0 && data[:resource].split(".").length == 1
-      server_middlewares.each { |middleware| middleware.call }
+      server_middlewares.each do |middleware|
+        begin 
+          middleware.call
+        rescue => error
+          response = Response.new("", 500)
+          response.server_error(error)
+        end
+      end
     end
+
+    if data.nil?
+      return
+    end
+
     case data[:method]
     when 'GET'
       current_route = @get_routes.find { |route| route[:regex].match(data[:resource]) }
       if current_route
         current_route_middleware = route_middlewares.select { |middleware| middleware[:regex] == current_route[:regex]}
-        current_route_middleware.length > 0 ? current_route_middleware[0][:code].call : nil
+        
+        if current_route_middleware.length > 0
+          begin
+            current_route_middleware[0][:code].call
+          rescue => error
+            response = Response.new("", 500)
+            response.server_error(error)
+          end
+        else
+          nil
+        end
         params_value = data[:resource].split('/').reject(&:empty?)
         current_route[:params].keys.each_with_index do |key, index|
           current_route[:params][key] = params_value[index]
@@ -37,7 +60,12 @@ class Router
         request.merge!(data)
         response = Response.new('')
         response.change_content_type('text/html; charset=utf-8')
-        current_route[:code].call(request, response)
+        begin
+          current_route[:code].call(request, response)
+        rescue => error
+          response = Response.new("", 500)
+          response.server_error(error)
+        end
       # Handles css
       elsif data[:Accept].include?('text/css')
         value = css(data[:resource])
@@ -54,31 +82,39 @@ class Router
         value = load_script(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('*/*')
+      else
+        puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow}!"
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'POST'
       current_route = @post_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        response = Response.new('Not found', 404)
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'PUT'
       current_route = @put_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        response = Response.new('Not found', 404)
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'DELETE'
       current_route = @delete_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        response = Response.new('Not found', 404)
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'PATCH'
       current_route = @patch_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        response = Response.new('Not found', 404)
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     end
 
     if response.nil?
-      response = Response.new('', 404)
+      response = Response.new("", 404)
     end
     response.create_response.to_s
   end
