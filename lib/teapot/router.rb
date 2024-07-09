@@ -84,57 +84,32 @@ class Router
         response.change_content_type('*/*')
       else
         puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow}!"
-        begin
-          response = Response.new(File.read('errors/404.html'), 404)
-          response.change_content_type('text/html; charset=utf-8')
-        rescue Errno::ENOENT
-          response = Response.new("", 404)
-          response.not_found(data[:resource])
-        end
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'POST'
       current_route = @post_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        begin
-          response = Response.new(File.read('errors/404.html'), 404)
-          response.change_content_type('text/html; charset=utf-8')
-        rescue Errno::ENOENT
-          response = Response.new("", 404)
-          response.not_found(data[:resource])
-        end
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'PUT'
       current_route = @put_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        begin
-          response = Response.new(File.read('errors/404.html'), 404)
-          response.change_content_type('text/html; charset=utf-8')
-        rescue Errno::ENOENT
-          response = Response.new("", 404)
-          response.not_found(data[:resource])
-        end
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'DELETE'
       current_route = @delete_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        begin
-          response = Response.new(File.read('errors/404.html'), 404)
-          response.change_content_type('text/html; charset=utf-8')
-        rescue Errno::ENOENT
-          response = Response.new("", 404)
-          response.not_found(data[:resource])
-        end
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     when 'PATCH'
       current_route = @patch_routes.find { |route| route[:regex].match(data[:resource]) }
       unless current_route
-        begin
-          response = Response.new(File.read('errors/404.html'), 404)
-          response.change_content_type('text/html; charset=utf-8')
-        rescue Errno::ENOENT
-          response = Response.new("", 404)
-          response.not_found(data[:resource])
-        end
+        response = Response.new("", 404)
+        response.not_found(data[:resource])
       end
     end
 
