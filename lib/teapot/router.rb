@@ -28,6 +28,7 @@ class Router
           response = Response.new("", 500)
           response.server_error(error)
         end
+      end
     end
 
     if data.nil?
@@ -46,6 +47,7 @@ class Router
           rescue => error
             response = Response.new("", 500)
             response.server_error(error)
+          end
         else
           nil
         end
