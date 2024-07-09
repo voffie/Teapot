@@ -69,7 +69,7 @@ class Router
         end
 
       # Handles css
-      elsif data[:Accept].include?('text/css')
+      elsif data[:Accept] && data[:Accept].include?('text/css')
         value = css(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('text/css')
@@ -87,7 +87,7 @@ class Router
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('*/*')
       else
-        puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow}!"
+        puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow} !"
         response = Response.new("", 404)
         response.not_found(data[:resource])
       end
