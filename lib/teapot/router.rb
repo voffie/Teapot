@@ -39,7 +39,7 @@ class Router
         response.change_content_type('text/html; charset=utf-8')
         current_route[:code].call(request, response)
       # Handles css
-      elsif data[:Accept].include?('text/css')
+      elsif data[:Accept] && data[:Accept].include?('text/css')
         value = css(data[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('text/css')
