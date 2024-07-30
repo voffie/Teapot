@@ -59,8 +59,9 @@ class Teapot
   end
 
   def patch(path, &block)
-    regex = generate_reg_exp(path)
-    @router.patch_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.patch_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def use_middleware(path, &block)
