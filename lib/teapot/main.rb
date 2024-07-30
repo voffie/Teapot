@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'socket'
+require 'json'
 require 'teapot/parser'
 require 'teapot/router'
 
@@ -23,6 +24,10 @@ class Teapot
         data += line
       end
       parsed_data = parse(data)
+      if parsed_data[:Content_Length].to_i > 0
+        parsed_data[:body] = JSON.parse(session.read(parsed_data[:Content_Length].to_i))
+        parsed_data[:body] = parsed_data[:body].transform_keys(&:to_sym)
+      end
       response = @router.handle_method(parsed_data, @server_middlewares, @route_middlewares)
       session.print response
       session.close
@@ -36,23 +41,27 @@ class Teapot
   end
 
   def post(path, &block)
-    regex = generate_reg_exp(path)
-    @router.post_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.post_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def put(path, &block)
-    regex = generate_reg_exp(path)
-    @router.put_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.put_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def delete(path, &block)
-    regex = generate_reg_exp(path)
-    @router.delete_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.delete_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def patch(path, &block)
-    regex = generate_reg_exp(path)
-    @router.patch_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.patch_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def use_middleware(path, &block)
