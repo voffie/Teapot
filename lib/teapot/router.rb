@@ -116,7 +116,22 @@ class Router
 
     when 'PUT'
       current_route = @put_routes.find { |route| route[:regex].match(data[:resource]) }
-      unless current_route
+      if current_route
+        params_value = data[:resource].split('/').reject(&:empty?)
+        current_route[:params].keys.each_with_index do |key, index|
+          current_route[:params][key] = params_value[index]
+        end
+        params = current_route[:params].select { |k| k.start_with?(':') }
+        request = { params: params }
+        request.merge!(data)
+        response = Response.new('')
+        begin
+          current_route[:code].call(request, response)
+        rescue => error
+          response = Response.new("", 500)
+          response.server_error(error)
+        end
+      else
         response = Response.new("", 404)
         response.not_found(data[:resource])
       end
