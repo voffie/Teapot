@@ -53,8 +53,9 @@ class Teapot
   end
 
   def delete(path, &block)
-    regex = generate_reg_exp(path)
-    @router.delete_routes.push({ path: path, regex: regex, code: block })
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @router.delete_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
   end
 
   def patch(path, &block)
