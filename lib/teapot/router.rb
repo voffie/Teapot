@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require 'teapot/utils'
 require 'teapot/response'
 require 'teapot/resource_manager'
 require 'teapot/color'
 
 IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
 
+module Router
+  include ResourceManager, Utils
+  
   @@routes = []
 
   def generate_route(path, type, block)
@@ -17,15 +21,15 @@ IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
   def handle_request(request)
     current_route = @@routes.find { |route| route[:regex].match(request[:resource]) && route[:type] == request[:method]}
 
-      if current_route
+    if current_route
       params_value = request[:resource].split('/').reject(&:empty?)
-        current_route[:params].keys.each_with_index do |key, index|
-          current_route[:params][key] = params_value[index]
-        end
-        params = current_route[:params].select { |k| k.start_with?(':') }
+      current_route[:params].keys.each_with_index do |key, index|
+        current_route[:params][key] = params_value[index]
+      end
+      params = current_route[:params].select { |k| k.start_with?(':') }
       params = { params: params }
       request.merge!(params)
-        response = Response.new('')
+      response = Response.new('')
     end
 
     case request[:method]
