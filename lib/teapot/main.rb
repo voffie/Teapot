@@ -6,7 +6,7 @@ require 'teapot/parser'
 require 'teapot/router'
 
 class Teapot
-  include Parser
+  include Parser, Router
   attr_reader :server
 
   def initialize(port)
@@ -24,7 +24,7 @@ class Teapot
 
         while line = socket.gets and line !~ /^\s*$/
           request += line
-      end
+        end
 
         if request == ''
           next
@@ -35,7 +35,7 @@ class Teapot
         if parsed_request[:Content_Length].to_i > 0
           parsed_request[:body] = JSON.parse(socket.read(parsed_request[:Content_Length].to_i))
           parsed_request[:body] = parsed_request[:body].transform_keys(&:to_sym)
-      end
+        end
 
         response = handle_request(parsed_request)
         
@@ -52,22 +52,4 @@ class Teapot
   def post(path, &block)
     generate_route(path, "POST", block)
   end
-end
-
-# https://stackoverflow.com/questions/67407289/check-if-path-matches-dynamic-route-string
-def generate_reg_exp(path)
-  escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
-  regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
-  Regexp.new("^#{regex.join('\/')}$")
-end
-
-def get_params_from_path(path)
-  params = path.split('/').reject(&:empty?)
-  parsed_params = {}
-  unless params.empty?
-    params.each do |param|
-      parsed_params[param] = ''
-    end
-  end
-  parsed_params
 end
