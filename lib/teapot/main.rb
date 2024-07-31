@@ -9,10 +9,8 @@ class Teapot
   include Parser
   attr_reader :server
 
-  def initialize
-    @router = Router.new
-    @server_middlewares = []
-    @route_middlewares = []
+  def initialize(port)
+    @server = TCPServer.new(port)
   end
 
   def listen(setup_func)
