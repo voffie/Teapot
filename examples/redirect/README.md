@@ -13,8 +13,8 @@ The `redirect()` function takes one param:
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.redirect('/redirect')

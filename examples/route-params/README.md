@@ -11,8 +11,8 @@ The `req[:params]` property stores all params in a hash which allows the user to
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/params/:PARAM_NAME') do |req, res|
   p req[:params][":PARAM_NAME"]

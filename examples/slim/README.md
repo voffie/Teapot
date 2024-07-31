@@ -19,8 +19,8 @@ The `slim` function takes in three arguments:
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:NAME_OF_SLIM_FILE)
@@ -36,8 +36,8 @@ To render without a layout you can simply pass `false` as the second argument
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:NAME_OF_SLIM_FILE, false)
@@ -53,8 +53,8 @@ To render Ruby variables in your Slim templates pass a hash as the third argumen
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:index, true, {toggle: true, VARIABLE_NAME: "VALUE"})
