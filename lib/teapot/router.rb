@@ -6,34 +6,13 @@ require 'teapot/color'
 
 IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
 
-class Router
-  attr_accessor :get_routes, :post_routes, :put_routes, :delete_routes, :patch_routes
+  @@routes = []
 
-  include ResourceManager
-
-  def initialize
-    @get_routes = []
-    @post_routes = []
-    @put_routes = []
-    @delete_routes = []
-    @patch_routes = []
+  def generate_route(path, type, block)
+    parsed_params = get_params_from_path(path)
+    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    @@routes.push({ path: path, regex: regex, code: block, params: parsed_params, type: type })
   end
-
-  def handle_method(data, server_middlewares, route_middlewares)
-    if server_middlewares.length > 0 && data[:resource].split(".").length == 1
-      server_middlewares.each do |middleware|
-        begin 
-          middleware.call
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-      end
-    end
-
-    if data.nil?
-      return
-    end
 
     case data[:method]
     when 'GET'

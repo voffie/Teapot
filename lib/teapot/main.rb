@@ -48,42 +48,11 @@ class Teapot
   end
 
   def get(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.get_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
+    generate_route(path, "GET", block)
   end
 
   def post(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.post_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def put(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.put_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def delete(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.delete_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def patch(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.patch_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def use_middleware(path, &block)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @route_middlewares.push({ path: path, regex: regex, code: block })
-  end
-
-  def before(block)
-    @server_middlewares.push(block)
+    generate_route(path, "POST", block)
   end
 end
 
