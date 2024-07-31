@@ -14,31 +14,23 @@ IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
     @@routes.push({ path: path, regex: regex, code: block, params: parsed_params, type: type })
   end
 
-    case data[:method]
-    when 'GET'
-      current_route = @get_routes.find { |route| route[:regex].match(data[:resource]) }
-      if current_route
-        current_route_middleware = route_middlewares.select { |middleware| middleware[:regex] == current_route[:regex]}
-        
-        if current_route_middleware.length > 0
-          begin
-            current_route_middleware[0][:code].call
-          rescue => error
-            response = Response.new("", 500)
-            response.server_error(error)
-          end
-        else
-          nil
-        end
+  def handle_request(request)
+    current_route = @@routes.find { |route| route[:regex].match(request[:resource]) && route[:type] == request[:method]}
 
-        params_value = data[:resource].split('/').reject(&:empty?)
+      if current_route
+      params_value = request[:resource].split('/').reject(&:empty?)
         current_route[:params].keys.each_with_index do |key, index|
           current_route[:params][key] = params_value[index]
         end
         params = current_route[:params].select { |k| k.start_with?(':') }
-        request = { params: params }
-        request.merge!(data)
+      params = { params: params }
+      request.merge!(params)
         response = Response.new('')
+    end
+
+    case request[:method]
+    when 'GET'
+      if current_route
         response.change_content_type('text/html; charset=utf-8')
         begin
           current_route[:code].call(request, response)
@@ -48,120 +40,40 @@ IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
         end
 
       # Handles css
-      elsif data[:Accept] && data[:Accept].include?('text/css')
-        value = css(data[:resource])
+      elsif request[:Accept] && request[:Accept].include?('text/css')
+        value = css(request[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('text/css')
 
       # Handles imgs
-      elsif IMG_ENDINGS.include?(data[:resource].split('.')[1].to_s)
-        value = load_img(data[:resource])
+      elsif IMG_ENDINGS.include?(request[:resource].split('.')[1].to_s)
+        value = load_img(request[:resource])
         response = value[:status] === 200 ? Response.new(value[:file]) : Response.new('Not found', 404)
         response.change_content_type(value[:ct])
         response.change_content_length(value[:size])
 
       # Handles scripts (js/ts currently)
-      elsif data[:resource].end_with?('js') || data[:resource].end_with?('ts')
-        value = load_script(data[:resource])
+      elsif request[:resource].end_with?('js') || request[:resource].end_with?('ts')
+        value = load_script(request[:resource])
         response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
         response.change_content_type('*/*')
-      else
-        puts "#{"Warning!".red} Teapot do not recognize the route #{data[:resource].yellow} !"
-        response = Response.new("", 404)
-        response.not_found(data[:resource])
       end
 
     when 'POST'
-      current_route = @post_routes.find { |route| route[:regex].match(data[:resource]) }
       if current_route
-        params_value = data[:resource].split('/').reject(&:empty?)
-        current_route[:params].keys.each_with_index do |key, index|
-          current_route[:params][key] = params_value[index]
-        end
-        params = current_route[:params].select { |k| k.start_with?(':') }
-        request = { params: params }
-        request.merge!(data)
-        response = Response.new('')
         begin
           current_route[:code].call(request, response)
         rescue => error
           response = Response.new("", 500)
           response.server_error(error)
         end
-      else
-        response = Response.new("", 404)
-        response.not_found(data[:resource])
-      end
-
-    when 'PUT'
-      current_route = @put_routes.find { |route| route[:regex].match(data[:resource]) }
-      if current_route
-        params_value = data[:resource].split('/').reject(&:empty?)
-        current_route[:params].keys.each_with_index do |key, index|
-          current_route[:params][key] = params_value[index]
-        end
-        params = current_route[:params].select { |k| k.start_with?(':') }
-        request = { params: params }
-        request.merge!(data)
-        response = Response.new('')
-        begin
-          current_route[:code].call(request, response)
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-      else
-        response = Response.new("", 404)
-        response.not_found(data[:resource])
-      end
-
-    when 'DELETE'
-      current_route = @delete_routes.find { |route| route[:regex].match(data[:resource]) }
-      if current_route
-        params_value = data[:resource].split('/').reject(&:empty?)
-        current_route[:params].keys.each_with_index do |key, index|
-          current_route[:params][key] = params_value[index]
-        end
-        params = current_route[:params].select { |k| k.start_with?(':') }
-        request = { params: params }
-        request.merge!(data)
-        response = Response.new('')
-        begin
-          current_route[:code].call(request, response)
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-      else
-        response = Response.new("", 404)
-        response.not_found(data[:resource])
-      end
-
-    when 'PATCH'
-      current_route = @patch_routes.find { |route| route[:regex].match(data[:resource]) }
-      if current_route
-        params_value = data[:resource].split('/').reject(&:empty?)
-        current_route[:params].keys.each_with_index do |key, index|
-          current_route[:params][key] = params_value[index]
-        end
-        params = current_route[:params].select { |k| k.start_with?(':') }
-        request = { params: params }
-        request.merge!(data)
-        response = Response.new('')
-        begin
-          current_route[:code].call(request, response)
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-      else
-        response = Response.new("", 404)
-        response.not_found(data[:resource])
       end
     end
 
     if response.nil?
+      puts "#{"Warning!".red} Teapot do not recognize the route #{request[:resource].yellow} !"
       response = Response.new("", 404)
+      response.not_found(request[:resource])
     end
 
     response.create_response.to_s
