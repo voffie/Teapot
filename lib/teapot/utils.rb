@@ -4,8 +4,8 @@ module Utils
     if path == "/"
       return %r{^/$}
     else
-    escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
-    regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
+      escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
+      regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
       return Regexp.new("^#{regex.join('\/')}$")
     end
   end
@@ -13,7 +13,7 @@ module Utils
   def get_params_from_path(path)
     params = path.split('/').reject(&:empty?)
     parsed_params = {}
-    unless params.empty?
+    unless params.empty? || params.select { |param| param.start_with?(':')}.length == 0
       params.each do |param|
         parsed_params[param] = ''
       end
