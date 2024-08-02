@@ -1,9 +1,13 @@
 module Utils
   # https://stackoverflow.com/questions/67407289/check-if-path-matches-dynamic-route-string
   def generate_reg_exp(path)
+    if path == "/"
+      return %r{^/$}
+    else
     escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
     regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
-    Regexp.new("^#{regex.join('\/')}$")
+      return Regexp.new("^#{regex.join('\/')}$")
+    end
   end
 
   def get_params_from_path(path)

@@ -14,7 +14,7 @@ module Router
 
   def generate_route(path, type, block)
     parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
+    regex = generate_reg_exp(path)
     @@routes.push({ path: path, regex: regex, code: block, params: parsed_params, type: type })
   end
 
