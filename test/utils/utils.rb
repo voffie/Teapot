@@ -19,3 +19,13 @@ describe "Regex parsing" do
     assert_equal(regex.match("/params/52").to_s, "/params/52")
   end
 end
+
+describe "URL params parsing" do
+  it "Returns correct params" do
+    assert_equal(get_params_from_path("/:param"), {":param"=>""})
+  end
+
+  it "Empty params" do
+    assert_equal(get_params_from_path("/test/without/params"), {})
+  end
+end
