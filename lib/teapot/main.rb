@@ -5,8 +5,10 @@ require 'json'
 require 'teapot/parser'
 require 'teapot/router'
 
+# Base class for Teapot gem
 class Teapot
-  include Parser, Router
+  include Router
+  include Parser
   attr_reader :server
 
   def initialize(port)
@@ -22,23 +24,21 @@ class Teapot
       Thread.new do
         request = ''
 
-        while line = socket.gets and line !~ /^\s*$/
+        while (line = socket.gets) && line !~ /^\s*$/
           request += line
         end
 
-        if request == ''
-          next
-        end
+        next if request == ''
 
         parsed_request = parse(request)
 
-        if parsed_request[:Content_Length].to_i > 0
+        if parsed_request[:Content_Length].to_i.positive?
           parsed_request[:body] = JSON.parse(socket.read(parsed_request[:Content_Length].to_i))
           parsed_request[:body] = parsed_request[:body].transform_keys(&:to_sym)
         end
 
         response = handle_request(parsed_request)
-        
+
         socket.print response
         socket.close
       end
@@ -46,10 +46,10 @@ class Teapot
   end
 
   def get(path, &block)
-    generate_route(path, "GET", block)
+    generate_route(path, 'GET', block)
   end
 
   def post(path, &block)
-    generate_route(path, "POST", block)
+    generate_route(path, 'POST', block)
   end
 end
