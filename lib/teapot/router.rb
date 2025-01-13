@@ -5,21 +5,27 @@ require 'teapot/response'
 require 'teapot/resource_manager'
 require 'teapot/color'
 
-IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp]
+IMG_ENDINGS = %w[apng avif gif jpg jpeg jfif pjpeg pjp png svg webp].freeze
 
+# Router module to handle incoming parsed HTTP requests
 module Router
-  include ResourceManager, Utils
-  
-  @@routes = []
+  include Utils
+  include ResourceManager
+
+  def self.included(base)
+    base.instance_variable_set(:@routes, [])
+  end
 
   def generate_route(path, type, block)
     parsed_params = get_params_from_path(path)
     regex = generate_reg_exp(path)
-    @@routes.push({ path: path, regex: regex, code: block, params: parsed_params, type: type })
+    self.class.instance_variable_get(:@routes) << ({ path: path, regex: regex, code: block, params: parsed_params, type: type })
   end
 
   def handle_request(request)
-    current_route = @@routes.find { |route| route[:regex].match(request[:resource]) && route[:type] == request[:method]}
+    current_route = self.class.instance_variable_get(:@routes).find do |route|
+      route[:regex].match(request[:resource]) && route[:type] == request[:method]
+    end
 
     if current_route
       params_value = request[:resource].split('/').reject(&:empty?)
