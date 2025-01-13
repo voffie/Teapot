@@ -29,57 +29,76 @@ module Router
       params = current_route[:params].select { |k| k.start_with?(':') }
       params = { params: params }
       request.merge!(params)
-      response = Response.new('')
     end
 
-    case request[:method]
-    when 'GET'
-      if current_route
-        response.change_content_type('text/html; charset=utf-8')
-        begin
-          current_route[:code].call(request, response)
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-
-      # Handles css
-      elsif request[:Accept] && request[:Accept].include?('text/css')
-        value = css(request[:resource])
-        response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
-        response.change_content_type('text/css')
-
-      # Handles imgs
-      elsif IMG_ENDINGS.include?(request[:resource].split('.')[1].to_s)
-        value = load_img(request[:resource])
-        response = value[:status] === 200 ? Response.new(value[:file]) : Response.new('Not found', 404)
-        response.change_content_type(value[:ct])
-        response.change_content_length(value[:size])
-
-      # Handles scripts (js/ts currently)
-      elsif request[:resource].end_with?('js') || request[:resource].end_with?('ts')
-        value = load_script(request[:resource])
-        response = value[:status] === 200 ? Response.new(value[:content]) : Response.new('Not found', 404)
-        response.change_content_type('*/*')
+    response =
+      case request[:method]
+      when 'GET'
+        handle_get_request(request, current_route)
+      when 'POST'
+        handle_post_request(request, current_route)
       end
-
-    when 'POST'
-      if current_route
-        begin
-          current_route[:code].call(request, response)
-        rescue => error
-          response = Response.new("", 500)
-          response.server_error(error)
-        end
-      end
-    end
 
     if response.nil?
-      puts "#{"Warning!".red} Teapot do not recognize the route #{request[:resource].yellow} !"
-      response = Response.new("", 404)
-      response.not_found(request[:resource])
+      puts "#{'Warning!'.red} Teapot do not recognize the route #{request[:resource].yellow} !"
+      response = Response.default404(request[:resource])
     end
 
     response.create_response.to_s
+  end
+
+  def handle_get_request(request, current_route)
+    if current_route
+      response = Response.new
+      response.change_content_type('text/html; charset=utf-8')
+      begin
+        current_route[:code].call(request, response)
+      rescue StandardError => e
+        Response.default500(e)
+      end
+
+    # Handles css
+    elsif request[:Accept]&.include?('text/css')
+      Response.new
+      value = css(request[:resource])
+      response = value[:status] == 200 ? Response.new(200, value[:content]) : Response.default404(request[:resource])
+      response.change_content_type('text/css')
+
+    # Handles imgs
+    elsif IMG_ENDINGS.include?(request[:resource].split('.')[1].to_s)
+      value = load_img(request[:resource])
+      if value[:status] == 200
+        response = Response.new(200, value[:file])
+        response.change_content_type(value[:ct])
+        response.change_content_length(value[:size])
+      else
+        response = Response.default404(request[:resource])
+      end
+
+    # Handles scripts (js/ts currently)
+    elsif request[:resource].end_with?('js') || request[:resource].end_with?('ts')
+      value = load_script(request[:resource])
+      if value[:status] == 200
+        response = Response.new(200, value[:content])
+        response.change_content_type('*/*')
+      else
+        Response.default404(request[:resource])
+      end
+    end
+
+    response
+  end
+
+  def handle_post_request(request, current_route)
+    response = Response.new
+    return unless current_route
+
+    begin
+      current_route[:code].call(request, response)
+    rescue StandardError => e
+      Response.default500(e)
+    end
+
+    response
   end
 end
