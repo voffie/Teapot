@@ -3,12 +3,12 @@ require 'teapot'
 port = 4567
 server = Teapot.new(port)
 
-server.get('/') do |req, res|
+server.get('/') do |_req, res|
   res.redirect('/redirect')
 end
 
-server.get('/redirect') do |req, res|
-  res.body = "I got redirected here"
+server.get('/redirect') do |_req, res|
+  res.body = 'I got redirected here'
 end
 
-server.listen(lambda { puts "Example app listening on port #{port}" })
+server.listen(-> { puts "Example app listening on port #{port}" })

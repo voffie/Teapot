@@ -2,12 +2,11 @@
 
 VALID_METHODS = %w[GET POST PUT DELETE PATCH].freeze
 
+# Parser module to parse HTTP requests
 module Parser
   def parse(request)
     request = request.split("\n")
-    if request[0].nil?
-      return nil
-    end
+    return nil if request[0].nil?
 
     method, resource, http = request[0].split
     parsed_request = {}

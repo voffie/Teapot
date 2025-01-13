@@ -3,8 +3,8 @@ require 'teapot'
 port = 4567
 server = Teapot.new(port)
 
-server.get('/') do |req, res|
+server.get('/') do |_req, res|
   res.body = File.read('views/index.html')
 end
 
-server.listen(lambda { puts "Example app listening on port #{port}" })
+server.listen(-> { puts "Example app listening on port #{port}" })
