@@ -16,106 +16,34 @@ class Response
   end
 
   def self.default404(route)
-    body = "<!DOCTYPE html>
-    <html lang='en'>
-      <head>
-        <meta charset='UTF-8' />
-        <meta
-          name='viewport'
-          content='width=device-width, initial-scale=1.0'
-        />
-        <title>Teapot - 404</title>
-        <style>
-          *,
-          *::before,
-          *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-          }
-
-          div {
-            position: fixed;
-            inset: 0px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-image: linear-gradient(to bottom, #151515, #171717);
-            color: white;
-            gap: .5rem;
-          }
-
-          h1, p {
-            z-index: 1;
-          }
-        </style>
-      </head>
-      <body>
-        <div>
-          <h1>Teapot does not recognize this kettle</h1>
-          <p>Unkown route #{route}</p>
-        </div>
-      </body>
-    </html>"
-
-    new(404, body)
+    body = load_error_page('404.html', { route: route })
+    new(404, body, { 'Content-Type' => 'text/html' })
   end
 
   def self.default500(error)
-    body = "<!DOCTYPE html>
-    <html lang='en'>
-      <head>
-        <meta charset='UTF-8' />
-        <meta
-          name='viewport'
-          content='width=device-width, initial-scale=1.0'
-        />
-        <title>Teapot - 404</title>
-                <style>
-          *,
-          *::before,
-          *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-          }
+    body = load_error_page('500.html', { error_message: error.message, error_class: error.class, backtrace: error.backtrace })
+    new(500, body, { 'Content-Type' => 'text/html' })
+  end
 
-          div {
-            position: fixed;
-            inset: 0px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-image: linear-gradient(to bottom, #151515, #171717);
-            color: white;
-            gap: .5rem;
-          }
+  def self.load_error_page(filename, locals = {})
+    user_path = "./views/#{filename}"
+    gem_path = File.join(Gem::Specification.find_by_name('teapot').gem_dir, 'lib', 'teapot', 'views', filename)
 
-          h1, p {
-            z-index: 1;
-          }
+    if File.exist?(user_path)
+      template = File.read(user_path)
+    else
+      return '<html><body><h1>Error loading template</h1></body></html>' unless File.exist?(gem_path)
 
-          p {
-            margin-bottom: 2rem;
-          }
+      template = File.read(gem_path)
+    end
 
-          code {
-            background: #eee;
-          }
-        </style>
-      </head>
-      <body>
-        <div>
-          <h1>Teapot had issues using this kettle</h1>
-          <p>#{error.class}: #{error.message}</p>
-          <pre>#{error.backtrace}</pre>
-        </div>
-      </body>
-    </html>"
+    locals.each do |key, value|
+      template.gsub!("<%= #{key} %>", value.to_s)
+    end
 
-    new(500, body)
+    template
+  rescue Errno::ENOENT
+    '<html><body><h1>Error loading template</h1></body></html>'
   end
 
   def create_cookie(name, value)
