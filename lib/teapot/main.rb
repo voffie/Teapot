@@ -3,16 +3,18 @@
 require 'socket'
 require 'json'
 require 'teapot/parser'
-require 'teapot/router'
+require 'teapot/http_handler'
+require 'teapot/get_handler'
+require 'teapot/post_handler'
 
 # Base class for Teapot gem
 class Teapot
-  include Router
   include Parser
   attr_reader :server
 
   def initialize(port)
     @server = TCPServer.new(port)
+    @routes = { 'GET' => [], 'POST' => [] }
   end
 
   def listen
@@ -27,8 +29,14 @@ class Teapot
         while (line = socket.gets) && line !~ /^\s*$/
           request += line
         end
+  def get(path, &block)
+    @routes['GET'] << GetHandler.new(path, block)
+  end
 
         next if request == ''
+  def post(path, &block)
+    @routes['POST'] << PostHandler.new(path, block)
+  end
 
         parsed_request = parse(request)
 
@@ -45,11 +53,24 @@ class Teapot
     end
   end
 
-  def get(path, &block)
-    generate_route(path, 'GET', block)
-  end
+  def route_request(request)
+    method = request[:method]
+    return Response.default404(request[:path]) unless @routes.key?(method)
 
-  def post(path, &block)
-    generate_route(path, 'POST', block)
+    handler = @routes[method].find { |h| h.matches?(request[:resource]) }
+    if handler
+      response = handler.handle(request)
+      return response.is_a?(Response) ? response : Response.default404(request[:path])
+    end
+
+    response =
+      case method
+      when 'GET'
+        GetHandler.new(nil).handle(request)
+      when 'POST'
+        PostHandler.new(nil).handle(request)
+      end
+
+    response.is_a?(Response) ? response : Response.default404(request[:path])
   end
 end
