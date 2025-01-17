@@ -63,17 +63,11 @@ class Response
   end
 
   def create_response
-    headers = @header.to_a.map do |key, value|
-      "#{key}: #{value}"
-    end.join("\r\n")
-
-    cookies = @cookies.to_a.map do |key, value|
-      "Set-Cookie: #{key}=#{value}"
-    end.join("\r\n")
-
-    return "HTTP/1.1 #{status}\r\n#{headers}\r\n\r\n#{@body}" if cookies == ''
-
-    "HTTP/1.1 #{status}\r\n#{headers}\r\n#{cookies}\r\n\r\n#{@body}"
+    headers = @header.to_a.map { |key, value| "#{key}: #{value}" }.join("\r\n")
+    cookies = @cookies.to_a.map { |key, value| "Set-Cookie: #{key}=#{value}" }.join("\r\n")
+    response = "HTTP/1.1 #{@status}\r\n#{headers}\r\n"
+    response += "#{cookies}\r\n" unless cookies.empty?
+    response + "\r\n#{@body}"
   end
 
   def redirect(location)
