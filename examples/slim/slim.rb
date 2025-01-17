@@ -7,4 +7,4 @@ server.get('/') do |_req, res|
   res.body = res.slim(:index)
 end
 
-server.listen(-> { puts "Example app listening on port #{port}" })
+server.listen

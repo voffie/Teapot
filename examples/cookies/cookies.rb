@@ -8,4 +8,4 @@ server.get('/') do |_req, res|
   res.body = 'This page has cookies!'
 end
 
-server.listen(-> { puts "Example app listening on port #{port}" })
+server.listen
