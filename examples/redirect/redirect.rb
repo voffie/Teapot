@@ -8,7 +8,7 @@ server.get('/') do |_req, res|
 end
 
 server.get('/redirect') do |_req, res|
-  res.body = 'I got redirected here'
+  res.body = File.read('views/index.html')
 end
 
 server.listen
