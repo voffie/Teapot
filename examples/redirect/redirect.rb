@@ -11,4 +11,4 @@ server.get('/redirect') do |_req, res|
   res.body = 'I got redirected here'
 end
 
-server.listen(-> { puts "Example app listening on port #{port}" })
+server.listen

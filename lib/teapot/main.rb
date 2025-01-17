@@ -15,8 +15,8 @@ class Teapot
     @server = TCPServer.new(port)
   end
 
-  def listen(setup_func)
-    setup_func.call
+  def listen
+    puts "Teapot server started. Listening on port #{@server.addr[1]}..."
 
     loop do
       socket = @server.accept
