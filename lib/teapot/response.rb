@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'teapot/color'
 require 'teapot/resource_manager'
 
 # Response class to handle/generate responses
@@ -73,10 +72,6 @@ class Response
   def redirect(location)
     @header['Location'] = location
     change_status(301)
-  end
-
-  def print
-    puts create_response.green
   end
 
   def slim(resource, locals = {}, layout: true)
