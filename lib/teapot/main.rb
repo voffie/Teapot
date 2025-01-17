@@ -3,6 +3,7 @@
 require 'socket'
 require 'json'
 require 'teapot/parser'
+require 'teapot/response'
 require 'teapot/http_handler'
 require 'teapot/get_handler'
 require 'teapot/post_handler'
@@ -10,47 +11,61 @@ require 'teapot/post_handler'
 # Base class for Teapot gem
 class Teapot
   include Parser
-  attr_reader :server
 
   def initialize(port)
     @server = TCPServer.new(port)
+    @running = true
     @routes = { 'GET' => [], 'POST' => [] }
+
+    Signal.trap('INT') do
+      puts "\nShutting down server..."
+      close
+    end
+  end
+
+  def close
+    @running = false
+    @server.close
   end
 
   def listen
     puts "Teapot server started. Listening on port #{@server.addr[1]}..."
 
-    loop do
+    while @running
       socket = @server.accept
+      Thread.new { handle_connection(socket) }
+    end
+  end
 
-      Thread.new do
-        request = ''
-
-        while (line = socket.gets) && line !~ /^\s*$/
-          request += line
-        end
   def get(path, &block)
     @routes['GET'] << GetHandler.new(path, block)
   end
 
-        next if request == ''
   def post(path, &block)
     @routes['POST'] << PostHandler.new(path, block)
   end
 
-        parsed_request = parse(request)
+  def handle_connection(socket)
+    request = read_request(socket)
+    return unless request
 
-        if parsed_request[:Content_Length].to_i.positive?
-          parsed_request[:body] = JSON.parse(socket.read(parsed_request[:Content_Length].to_i))
-          parsed_request[:body] = parsed_request[:body].transform_keys(&:to_sym)
-        end
-
-        response = handle_request(parsed_request)
-
-        socket.print response
-        socket.close
-      end
+    parsed_request = parse(request)
+    if parsed_request[:Content_Length].to_i.positive?
+      parsed_request[:body] = JSON.parse(socket.read(parsed_request[:Content_Length].to_i))
+      parsed_request[:body] = parsed_request[:body].transform_keys(&:to_sym)
     end
+
+    response = route_request(parsed_request).create_response
+    socket.print response
+    socket.close
+  end
+
+  def read_request(socket)
+    request = ''
+    while (line = socket.gets) && line !~ /^\s*$/
+      request += line
+    end
+    request.empty? ? nil : request
   end
 
   def route_request(request)
