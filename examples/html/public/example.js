@@ -1,1 +1,2 @@
-console.log("Teapot JS/TS intergration is up and running!");
+console.log("The teapot has successfully brewed some JavaScript");
+
