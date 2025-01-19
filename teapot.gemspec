@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-version = File.read(File.expand_path('VERSION', __dir__)).strip
+version = File.read('./lib/teapot/version.rb')
 
 Gem::Specification.new 'teapot', version do |s|
   s.description = "A web server using Ruby's built-in TCPServer class & web sockets"
