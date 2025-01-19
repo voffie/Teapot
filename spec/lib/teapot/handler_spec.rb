@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'teapot/http_handler'
+require 'teapot'
 
-RSpec.describe HTTPHandler do
-  let(:handler) { HTTPHandler.new('/params/:is/:awesome') }
+RSpec.describe Teapot::HTTPHandler do
+  let(:handler) { Teapot::HTTPHandler.new('/params/:is/:awesome') }
 
   describe '#matches?' do
     it 'returns true for matching routes' do

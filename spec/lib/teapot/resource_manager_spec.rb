@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'teapot/resource_manager'
+require 'teapot'
 require 'fileutils'
 
-RSpec.describe ResourceManager do
-  include ResourceManager
+RSpec.describe Teapot::ResourceManager do
+  include Teapot::ResourceManager
 
   before do
     FileUtils.mkdir_p('./public')
