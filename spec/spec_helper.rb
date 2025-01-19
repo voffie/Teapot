@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require 'teapot' # Adjust if your gem module name is different
+require 'teapot'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
