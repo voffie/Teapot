@@ -3,6 +3,8 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'rake'
-gem 'slim'
-gem 'minitest', '~> 5.21', '>= 5.21.2'
+group :development, :test do
+  gem 'rspec'
+  gem 'rubocop', require: false
+  gem 'ruby-lsp'
+end

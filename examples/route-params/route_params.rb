@@ -1,11 +1,18 @@
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
+path = '/params/:is/:awesome'
 
-server.get('/params/:is/:awesome') do |req, res|
-  p req[:params]["awesome"]
-  res.body = req[:params]
+server.get(path) do |req, res|
+  template = File.read('views/index.html')
+
+  # Populates the example page with data
+  template.gsub!('<%= dynamic_route %>', path)
+  template.gsub!('<%= path %>', req[:resource])
+  template.gsub!('<%= params %>', req[:params].to_s)
+
+  res.body = template
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
+server.listen

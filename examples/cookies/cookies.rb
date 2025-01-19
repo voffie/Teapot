@@ -1,12 +1,11 @@
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
-server.get('/') do |req, res|
-  res.create_cookie('example', 'cookie')
-  res.create_cookie('example2', 'cookie2')
-  res.body = "This page has cookies!"
+server.get('/') do |_req, res|
+  res.create_cookie('teapot-example', 'cookie')
+  res.body = File.read('views/index.html')
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
+server.listen

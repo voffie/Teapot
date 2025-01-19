@@ -3,91 +3,91 @@
 require 'socket'
 require 'json'
 require 'teapot/parser'
-require 'teapot/router'
+require 'teapot/response'
+require 'teapot/http_handler'
+require 'teapot/get_handler'
+require 'teapot/post_handler'
 
-class Teapot
-  include Parser
-  attr_reader :server
+module Teapot
+  # Base class for Teapot gem
+  class Main
+    include Parser
 
-  def initialize
-    @router = Router.new
-    @server_middlewares = []
-    @route_middlewares = []
-  end
+    def initialize(port)
+      @server = TCPServer.new(port)
+      @running = true
+      @routes = { 'GET' => [], 'POST' => [] }
 
-  def listen(port, option)
-    server = TCPServer.new(port)
-    option.call
-    while (session = server.accept)
-      data = ''
-      while (line = session.gets) && line !~ /^\s*$/
-        data += line
+      Signal.trap('INT') do
+        puts "\nShutting down server..."
+        close
       end
-      parsed_data = parse(data)
-      if parsed_data[:Content_Length].to_i > 0
-        parsed_data[:body] = JSON.parse(session.read(parsed_data[:Content_Length].to_i))
-        parsed_data[:body] = parsed_data[:body].transform_keys(&:to_sym)
+    end
+
+    def close
+      @running = false
+      @server.close
+    end
+
+    def listen
+      puts "Teapot server started. Listening on port #{@server.addr[1]}..."
+
+      while @running
+        socket = @server.accept
+        Thread.new { handle_connection(socket) }
       end
-      response = @router.handle_method(parsed_data, @server_middlewares, @route_middlewares)
-      session.print response
-      session.close
+    end
+
+    def get(path, &block)
+      @routes['GET'] << GetHandler.new(path, block)
+    end
+
+    def post(path, &block)
+      @routes['POST'] << PostHandler.new(path, block)
+    end
+
+    def handle_connection(socket)
+      request = read_request(socket)
+      return unless request
+
+      parsed_request = parse(request)
+      if parsed_request[:Content_Length].to_i.positive?
+        parsed_request[:body] = JSON.parse(socket.read(parsed_request[:Content_Length].to_i))
+        parsed_request[:body] = parsed_request[:body].transform_keys(&:to_sym)
+      end
+
+      response = route_request(parsed_request).create_response
+      socket.print response
+      socket.close
+    end
+
+    def read_request(socket)
+      request = ''
+      while (line = socket.gets) && line !~ /^\s*$/
+        request += line
+      end
+      request.empty? ? nil : request
+    end
+
+    def route_request(request)
+      method = request[:method]
+      return Response.default404(request[:path]) unless @routes.key?(method)
+
+      handler = @routes[method].find { |h| h.matches?(request[:resource]) }
+      if handler
+        response = handler.handle(request)
+        return response.is_a?(Response) ? response : Response.default404(request[:path])
+      end
+
+      response =
+        case method
+        when 'GET'
+          GetHandler.new(nil).handle(request)
+        when 'POST'
+          PostHandler.new(nil).handle(request)
+        end
+
+      response.is_a?(Response) ? response : Response.default404(request[:path])
     end
   end
-
-  def get(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.get_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def post(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.post_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def put(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.put_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def delete(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.delete_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def patch(path, &block)
-    parsed_params = get_params_from_path(path)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @router.patch_routes.push({ path: path, regex: regex, code: block, params: parsed_params })
-  end
-
-  def use_middleware(path, &block)
-    regex = path === '/' ? %r{^/$} : generate_reg_exp(path)
-    @route_middlewares.push({ path: path, regex: regex, code: block })
-  end
-
-  def before(block)
-    @server_middlewares.push(block)
-  end
-end
-
-# https://stackoverflow.com/questions/67407289/check-if-path-matches-dynamic-route-string
-def generate_reg_exp(path)
-  escape_dots = ->(s) { s.chars.each { |char| char === '.' ? '\\.' : char }.join }
-  regex = path.split('/').map { |s| s.start_with?(':') ? '[^\\/]+' : escape_dots.call(s) }
-  Regexp.new("^#{regex.join('\/')}$")
-end
-
-def get_params_from_path(path)
-  params = path.split('/').reject(&:empty?)
-  parsed_params = {}
-  unless params.empty?
-    params.each do |param|
-      parsed_params[param] = ''
-    end
-  end
-  parsed_params
 end

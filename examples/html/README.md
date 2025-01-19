@@ -11,8 +11,8 @@ Teapot can render HTML by setting the response's `body` attribute to the file as
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.body = File.read(HTML_FILE_LOCATION)

@@ -1,23 +1,32 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-div {
-  position: fixed;
-  inset: 0px;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e8f5e9;
+  color: #1b5e20;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-image: linear-gradient(to bottom, #151515, #171717);
-  color: white;
-  gap: 0.5rem;
+  height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
 }
-h1,
-p {
-  z-index: 1;
+
+.container {
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+h1 {
+  margin-top: 0;
+  color: #2e7d32;
+}
+
+.teapot {
+  font-size: 48px;
+  margin-bottom: 20px;
 }

@@ -15,8 +15,8 @@ The `create_cookie()` function takes two params:
 ```rb
 require 'teapot'
 
-server = Teapot.new()
 port = 4567
+server = Teapot.new(port)
 
 server.get('/') do |req, res|
   res.create_cookie(NAME, VALUE)
