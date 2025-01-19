@@ -1,0 +1,52 @@
+name: Release Gem
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 'latest'
+          bundler-cache: true
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          version_bump=$(git log -1 --pretty=%B | grep -Eo '(major|minor|patch)' || echo 'patch')
+          echo "Detected version bump: $version_bump"
+
+          gem bump --$version_bump --tag
+          echo "VERSION=$(ruby -r ./lib/teapot/version -e 'puts Teapot::VERSION')" >> $GITHUB_ENV
+
+      - name: Build the gem
+        run: gem build teapot.gemspec
+
+      - name: Push to RubyGems
+        env:
+          RUBYGEMS_API_KEY: ${{ secret.RUBYGEMS_API_KEY }}
+        run: gem push teapot-*.gem
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: "v${{ env.VERSION }}"
+          body: "Release version ${{ env.VERSION }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
