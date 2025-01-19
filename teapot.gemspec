@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-version = File.read('./lib/teapot/version.rb')
+require_relative 'lib/teapot/version'
 
-Gem::Specification.new 'teapot', version do |s|
+Gem::Specification.new 'teapot', Teapot::VERSION do |s|
   s.description = "A web server using Ruby's built-in TCPServer class & web sockets"
   s.summary = 'TCP based web server'
   s.author = 'Voffie'
