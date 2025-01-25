@@ -17,6 +17,7 @@ module Teapot
       @server = TCPServer.new(port)
       @running = true
       @routes = { 'GET' => [], 'POST' => [] }
+      @middleware = []
 
       Signal.trap('INT') do
         puts "\nShutting down server..."
@@ -46,6 +47,39 @@ module Teapot
       @routes['POST'] << PostHandler.new(path, block)
     end
 
+    def use(path, &middleware)
+      @middleware << { path: path, middleware: middleware }
+    end
+
+    def process_middleware(request, response)
+      matching_middleware = @middleware.select { |m| match_route(m[:path], request[:resource]) }
+
+      matching_middleware.each do |middleware|
+        res = middleware[:middleware].call(request, response)
+        p res
+        return res if res.is_a?(Response)
+      end
+    end
+
+    def match_route(route, resource)
+      return true if route == '*'
+
+      route_segments = route.split('/')
+      resource_segments = resource.split('/')
+
+      return false if route_segments.length != resource_segments.length
+
+      route_segments.each_with_index do |_segments, index|
+        if segment.start_with?(':')
+          next
+        elsif segment != resource_segments[index]
+          return false
+        end
+      end
+
+      true
+    end
+
     def handle_connection(socket)
       request = read_request(socket)
       return unless request
@@ -70,6 +104,11 @@ module Teapot
     end
 
     def route_request(request)
+      response = Response.new
+      process_middleware(request, response)
+
+      return response unless response.body == ''
+
       method = request[:method]
       return Response.default404(request[:path]) unless @routes.key?(method)
 
