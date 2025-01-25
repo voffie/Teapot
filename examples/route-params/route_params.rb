@@ -10,6 +10,7 @@ server.get(path) do |req, res|
   # Populates the example page with data
   template.gsub!('<%= dynamic_route %>', path)
   template.gsub!('<%= path %>', req[:resource])
+  # Access the params through the req[:params] object
   template.gsub!('<%= params %>', req[:params].to_s)
 
   res.body = template

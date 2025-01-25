@@ -18,7 +18,5 @@ server.get('/') do |req, res|
   res.body = File.read(HTML_FILE_LOCATION)
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
-
-
+server.listen
 ```

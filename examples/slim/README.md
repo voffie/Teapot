@@ -23,10 +23,10 @@ port = 4567
 server = Teapot.new(port)
 
 server.get('/') do |req, res|
-  res.body = res.slim(:NAME_OF_SLIM_FILE)
+  res.body = res.slim(:index)
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
+server.listen
 ```
 
 ### Without layout
@@ -40,10 +40,10 @@ port = 4567
 server = Teapot.new(port)
 
 server.get('/') do |req, res|
-  res.body = res.slim(:NAME_OF_SLIM_FILE, false)
+  res.body = res.slim(:index, false)
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
+server.listen
 ```
 
 ### With variables
@@ -57,15 +57,13 @@ port = 4567
 server = Teapot.new(port)
 
 server.get('/') do |req, res|
-  res.body = res.slim(:index, true, {toggle: true, VARIABLE_NAME: "VALUE"})
+  res.body = res.slim(:index, true, { greeting: "Hello, world!" })
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
-
+server.listen
 ```
 
 ```
 div
-  -if toggle
-    p Value of VARIABLE_NAME #{VARIABLE_NAME}
+  p Value of greeting: #{greeting}
 ```
