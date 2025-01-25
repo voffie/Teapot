@@ -6,7 +6,7 @@ module Teapot
   # Response class to handle/generate responses
   class Response
     include ResourceManager
-    attr_accessor :body, :status
+    attr_accessor :body, :status, :header
 
     def initialize(status = 200, body = '', header = {})
       @status = status
