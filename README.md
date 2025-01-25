@@ -91,4 +91,4 @@ Since this project was meant as a learning experience, certain features are not 
 
 # Contributing
 
-As mentioned at the top this project was meant to be a learning experience for me. However I appreciate and welcome anyone that wants to submit changes!
+As mentioned at the top, this project was meant to be a learning experience for me. However I appreciate and welcome anyone that wants to submit changes!
