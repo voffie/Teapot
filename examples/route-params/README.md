@@ -14,12 +14,10 @@ require 'teapot'
 port = 4567
 server = Teapot.new(port)
 
-server.get('/params/:PARAM_NAME') do |req, res|
-  p req[:params][":PARAM_NAME"]
+server.get('/params/:example') do |req, res|
+  p req[:params][":example"]
   res.body = req[:params]
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
-
-
+server.listen
 ```

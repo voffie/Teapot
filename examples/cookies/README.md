@@ -22,6 +22,5 @@ server.get('/') do |req, res|
   res.create_cookie(NAME, VALUE)
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
-
+server.listen
 ```
