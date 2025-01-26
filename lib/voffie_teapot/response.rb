@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'teapot/resource_manager'
+require 'voffie_teapot/resource_manager'
 
-module Teapot
+module VoffieTeapot
   # Response class to handle/generate responses
   class Response
     include ResourceManager

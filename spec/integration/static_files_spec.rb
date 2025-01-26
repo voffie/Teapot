@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-require 'teapot/resource_manager'
-require 'teapot/main'
+require 'voffie_teapot'
 require 'fileutils'
 
 RSpec.describe 'Static Files Integration' do
   before do
     FileUtils.mkdir_p('./public')
     File.write('./public/styles.css', 'body { background: #fff; }')
-    @server = Teapot.new(4567)
+    @server = VoffieTeapot.new(4567)
   end
 
   after do

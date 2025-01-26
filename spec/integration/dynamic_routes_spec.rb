@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require 'teapot/response'
-require 'teapot/main'
+require 'voffie_teapot'
 
 RSpec.describe 'Dynamic Routes Integration' do
   before do
-    @server = Teapot.new(4568)
+    @server = VoffieTeapot.new(4568)
     @server.get('/params/:id/:name') do |request, response|
       response.body = "Hello #{request[:params][:id]} #{request[:params][:name]}"
       response

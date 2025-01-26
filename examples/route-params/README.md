@@ -9,10 +9,10 @@ This example shows you how to use and retrieve route params using the `req[:para
 The `req[:params]` property stores all params in a hash which allows the user to access each param by using `[":PARAM_NAME"]`
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/params/:example') do |req, res|
   p req[:params][":example"]

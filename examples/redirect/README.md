@@ -11,10 +11,10 @@ The `redirect()` function takes one param:
 **Location** (string): redirect target url
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/') do |req, res|
   res.redirect('/redirect')

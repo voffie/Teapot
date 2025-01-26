@@ -1,7 +1,7 @@
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.use('/') do |req, _res|
   # Updates the locals symbol of the incoming request

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'teapot'
+require 'voffie_teapot'
 
-RSpec.describe Teapot::Utils do
-  include Teapot::Utils
+RSpec.describe VoffieTeapot::Utils do
+  include VoffieTeapot::Utils
 
   describe '#generate_reg_exp' do
     it 'creates a regex for dynamic routes' do

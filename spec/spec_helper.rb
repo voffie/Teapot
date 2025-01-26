@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require 'teapot'
+require 'voffie_teapot'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

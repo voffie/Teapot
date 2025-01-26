@@ -9,7 +9,7 @@ IMG_CONTENT_TYPES = {
   svg: 'image/svg+xml', webp: 'image/webp'
 }.freeze
 
-module Teapot
+module VoffieTeapot
   # Module to handle loading/generating resources
   module ResourceManager
     def load_slim(resource, locals = {}, layout: true)

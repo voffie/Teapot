@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'teapot/utils'
+require 'voffie_teapot/utils'
 
-module Teapot
+module VoffieTeapot
   # Abstract class for HTTP method handlers
   class HTTPHandler
     include Utils

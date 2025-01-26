@@ -30,7 +30,7 @@ jobs:
           echo "Detected version bump: $version_bump"
 
           gem bump --$version_bump --tag
-          echo "VERSION=$(ruby -r ./lib/teapot/version -e 'puts Teapot::VERSION')" >> $GITHUB_ENV
+          echo "VERSION=$(ruby -r ./lib/voffie_teapot/version -e 'puts VoffieTeapot::VERSION')" >> $GITHUB_ENV
 
       - name: Build the gem
         run: gem build teapot.gemspec

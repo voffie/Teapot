@@ -9,10 +9,10 @@ This example shows you how to create middlewares using the `use(path, lambda)` m
 Teapot can run middleware both globally and on a route specific level as seen below:
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 # Global middleware
 server.use('*') do |req, res|

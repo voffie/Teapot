@@ -17,10 +17,10 @@ The `slim` function takes in three arguments:
 **Locals** (hash): hash containing variables to possibly render
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:index)
@@ -34,10 +34,10 @@ server.listen
 To render without a layout you can simply pass `false` as the second argument
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:index, false)
@@ -51,10 +51,10 @@ server.listen
 To render Ruby variables in your Slim templates pass a hash as the third argument
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/') do |req, res|
   res.body = res.slim(:index, true, { greeting: "Hello, world!" })
