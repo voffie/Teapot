@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'teapot'
+require 'voffie_teapot'
 require 'fileutils'
 
-RSpec.describe Teapot::ResourceManager do
-  include Teapot::ResourceManager
+RSpec.describe VoffieTeapot::ResourceManager do
+  include VoffieTeapot::ResourceManager
 
   before do
     FileUtils.mkdir_p('./public')

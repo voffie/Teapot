@@ -1,8 +1,8 @@
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
-path = '/params/:is/:awesome'
+server = VoffieTeapot.new(port)
+path = '/params/:example'
 
 server.get(path) do |req, res|
   template = File.read('views/index.html')

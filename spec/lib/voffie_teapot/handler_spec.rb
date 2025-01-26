@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'teapot'
+require 'voffie_teapot'
 
-RSpec.describe Teapot::HTTPHandler do
-  let(:handler) { Teapot::HTTPHandler.new('/params/:is/:awesome') }
+RSpec.describe VoffieTeapot::HTTPHandler do
+  let(:handler) { VoffieTeapot::HTTPHandler.new('/params/:is/:awesome') }
 
   describe '#matches?' do
     it 'returns true for matching routes' do

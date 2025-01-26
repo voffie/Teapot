@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Teapot
+module VoffieTeapot
   # POST implementation of HTTPHandler
   class PostHandler < HTTPHandler
     def handle(request)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Teapot
+module VoffieTeapot
   # Module containing all utility methods required
   module Utils
     def generate_reg_exp(path)

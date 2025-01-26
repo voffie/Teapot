@@ -11,7 +11,7 @@
   </p>
 </p>
 
-[![Gem Version](https://badge.fury.io/rb/teapot.svg)](https://badge.fury.io/rb/teapot)
+[![Gem Version](https://badge.fury.io/rb/voffie_teapot.svg)](https://badge.fury.io/rb/voffie_teapot)
 [![Testing](https://github.com/voffie/teapot/actions/workflows/test.yml/badge.svg)](https://github.com/voffie/teapot/actions/workflows/test.yml)
 
 Teapot was named from the HTTP error code [**_"418 I'm a teapot"_**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418).
@@ -31,22 +31,22 @@ Teapot was named from the HTTP error code [**_"418 I'm a teapot"_**](https://dev
 
 ```ruby
 # app.rb
-require 'teapot'
+require 'voffie_teapot'
 
-server = Teapot.new()
+server = VoffieTeapot.new()
 port = 4567
 
 server.get('/') do |req, res|
   res.body = 'hello world'
 end
 
-server.listen(port, lambda { puts "Example app listening on port #{port}" })
+server.listen(port)
 ```
 
 Install the gems needed:
 
 ```shell
-gem install teapot
+gem install voffie_teapot
 ```
 
 And run with:

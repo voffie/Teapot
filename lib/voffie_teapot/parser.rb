@@ -2,7 +2,7 @@
 
 VALID_METHODS = %w[GET POST PUT DELETE PATCH].freeze
 
-module Teapot
+module VoffieTeapot
   # Parser module to parse HTTP requests
   module Parser
     def parse(request)

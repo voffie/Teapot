@@ -2,13 +2,13 @@
 
 require 'socket'
 require 'json'
-require 'teapot/parser'
-require 'teapot/response'
-require 'teapot/http_handler'
-require 'teapot/get_handler'
-require 'teapot/post_handler'
+require 'voffie_teapot/parser'
+require 'voffie_teapot/response'
+require 'voffie_teapot/http_handler'
+require 'voffie_teapot/get_handler'
+require 'voffie_teapot/post_handler'
 
-module Teapot
+module VoffieTeapot
   # Base class for Teapot gem
   class Main
     include Parser
@@ -56,7 +56,6 @@ module Teapot
 
       matching_middleware.each do |middleware|
         res = middleware[:middleware].call(request, response)
-        p res
         return res if res.is_a?(Response)
       end
     end

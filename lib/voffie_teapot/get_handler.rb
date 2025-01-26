@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'teapot/response'
-require 'teapot/resource_manager'
+require 'voffie_teapot/response'
+require 'voffie_teapot/resource_manager'
 
-module Teapot
+module VoffieTeapot
   # GET implementation of HTTPHandler
   class GetHandler < HTTPHandler
     include ResourceManager

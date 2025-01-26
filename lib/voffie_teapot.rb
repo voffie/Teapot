@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'teapot/main'
+require 'voffie_teapot/main'
 
 # Main module for the Teapot gem
-module Teapot
+module VoffieTeapot
   def self.new(...)
     Main.new(...)
   end

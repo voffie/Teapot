@@ -13,10 +13,10 @@ The `create_cookie()` function takes two params:
 **Value** (string): the value of the cookie
 
 ```rb
-require 'teapot'
+require 'voffie_teapot'
 
 port = 4567
-server = Teapot.new(port)
+server = VoffieTeapot.new(port)
 
 server.get('/') do |req, res|
   res.create_cookie(NAME, VALUE)
