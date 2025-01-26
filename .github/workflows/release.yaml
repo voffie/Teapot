@@ -23,22 +23,20 @@ jobs:
           ruby-version: 'latest'
           bundler-cache: true
 
-      - name: Bump version
-        id: bump_version
+      - name: Extract gem version
+        id: extract_version
         run: |
-          version_bump=$(git log -1 --pretty=%B | grep -Eo '(major|minor|patch)' || echo 'patch')
-          echo "Detected version bump: $version_bump"
-
-          gem bump --$version_bump --tag
-          echo "VERSION=$(ruby -r ./lib/voffie_teapot/version -e 'puts VoffieTeapot::VERSION')" >> $GITHUB_ENV
+          VERSION=$(ruby -r ./lib/voffie_teapot/version -e 'puts VoffieTeapot::VERSION')
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build the gem
-        run: gem build teapot.gemspec
+        run: gem build voffie_teapot.gemspec
 
       - name: Push to RubyGems
         env:
           RUBYGEMS_API_KEY: ${{ secret.RUBYGEMS_API_KEY }}
-        run: gem push teapot-*.gem
+        run: gem push voffie_teapot-*.gem
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
