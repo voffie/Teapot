@@ -27,7 +27,7 @@ module VoffieTeapot
 
     def self.load_error_page(filename, locals = {})
       user_path = "./views/#{filename}"
-      gem_path = File.join(Gem::Specification.find_by_name('teapot').gem_dir, 'lib', 'teapot', 'views', filename)
+      gem_path = File.join(Gem::Specification.find_by_name('voffie_teapot').gem_dir, 'lib', 'voffie_teapot', 'views', filename)
 
       if File.exist?(user_path)
         template = File.read(user_path)
