@@ -12,7 +12,6 @@ Gem::Specification.new 'voffie_teapot', VoffieTeapot::VERSION do |s|
   s.require_paths = ['lib']
   s.metadata = {
     'source_code_uri' => 'https://github.com/voffie/teapot',
-    'rubygems_mfa_required' => 'true',
     'bug_tracker_uri' => 'https://github.com/voffie/teapot/issues'
   }
   s.required_ruby_version = '>= 2.7.8'
