@@ -1,0 +1,50 @@
+name: Release Gem
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 'latest'
+          bundler-cache: true
+
+      - name: Extract gem version
+        id: extract_version
+        run: |
+          VERSION=$(ruby -r ./lib/voffie_teapot/version -e 'puts VoffieTeapot::VERSION')
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build the gem
+        run: gem build voffie_teapot.gemspec
+
+      - name: Push to RubyGems
+        env:
+          RUBYGEMS_API_KEY: ${{ secret.RUBYGEMS_API_KEY }}
+        run: gem push voffie_teapot-*.gem
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: "v${{ env.VERSION }}"
+          body: "Release version ${{ env.VERSION }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

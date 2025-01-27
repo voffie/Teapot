@@ -1,1 +1,0 @@
-console.log("Teapot JS/TS intergration is up and running!");
